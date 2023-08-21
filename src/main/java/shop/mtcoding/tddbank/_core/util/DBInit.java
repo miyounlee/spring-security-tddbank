@@ -27,6 +27,15 @@ public class DBInit {
                     .roles("ROLE_USER")
                     .build();
             userRepository.save(ssar);
+
+            User admin = User.builder()
+                    .username("admin")
+                    .password(passwordEncoder.encode("1234"))
+                    .email("admin@nate.com")
+                    .fullName("어드민")
+                    .roles("ROLE_ADMIN")
+                    .build();
+            userRepository.save(admin);
         };
     }
 }

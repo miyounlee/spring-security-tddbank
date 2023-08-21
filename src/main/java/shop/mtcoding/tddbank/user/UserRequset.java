@@ -6,6 +6,12 @@ import lombok.Setter;
 public class UserRequset {
 
     @Getter @Setter
+    public static class LoginDTO {
+        private String username;
+        private String password;
+    }
+
+    @Getter @Setter
     public static class JoinDTO {
         private String username;
         private String password;
