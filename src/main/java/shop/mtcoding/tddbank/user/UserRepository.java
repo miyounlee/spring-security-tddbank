@@ -1,6 +1,7 @@
 package shop.mtcoding.tddbank.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import javax.swing.text.html.Option;
