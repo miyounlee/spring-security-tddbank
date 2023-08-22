@@ -30,11 +30,11 @@ public class UserController {
 
         // 2. 회원가입 (원래는 서비스 요청) - 시큐리티는 password 인코딩이 무조건 되어야 한다.
         joinDTO.setPassword(passwordEncoder.encode(joinDTO.getPassword()));
-        userRepository.save(joinDTO.toEntity());
+        User userPS = userRepository.save(joinDTO.toEntity());
+        UserResponse.JoinDTO responseDTO = new UserResponse.JoinDTO(userPS);
 
         // 3. 응답
-
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiUtils.success(responseDTO));
     }
 
     @PostMapping("/login")
