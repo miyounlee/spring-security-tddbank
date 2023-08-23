@@ -2,6 +2,7 @@ package shop.mtcoding.tddbank.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +22,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @DisplayName("회원가입 성공")
     @Test
     public void join_test() throws Exception {
         // given
@@ -45,5 +47,28 @@ public class UserControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.response.username").value("love"));
         resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.response.email").value("love@gmail.com"));
         resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.response.fullName").value("러브"));
+    }
+
+    @DisplayName("비밀번호 길이로 실패")
+    @Test
+    public void join_fail1_test() throws Exception {
+        // given
+        UserRequset.JoinDTO joinDTO = new UserRequset.JoinDTO();
+        joinDTO.setUsername("love");
+        joinDTO.setEmail("love@gmail.com");
+        joinDTO.setPassword("123413254654321321654653213241654643213216546213216545");
+        joinDTO.setFullName("러브");
+
+        ObjectMapper om = new ObjectMapper();
+        String requestBody = om.writeValueAsString(joinDTO);    // 직렬화 (dto -> json)
+        System.out.println("테스트 : " + requestBody); // 변환 눈으로 확인
+
+        // when
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post("/join").content(requestBody).contentType(MediaType.APPLICATION_JSON));   // builder로 endExpect 쓰지말고 when, then 분리하기
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        System.out.println("테스트 : " + responseBody);
+
+        // then
+        resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false));
     }
 }

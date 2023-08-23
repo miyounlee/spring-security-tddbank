@@ -5,9 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,29 +15,26 @@ import shop.mtcoding.tddbank._core.security.CustomUserDetails;
 import shop.mtcoding.tddbank._core.security.JwtTokenProvider;
 import shop.mtcoding.tddbank._core.util.ApiUtils;
 
+import javax.validation.Valid;
+
+// 컨트롤러의 책임 - 요청 값 잘 받기, 유효성 검사 잘하기, 서비스 호출 잘하기, 응답 잘하기, 인증 체크(시큐리티가 해줌)
 @RequiredArgsConstructor
 @RestController
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;  // 원래 서비스에서
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody UserRequset.JoinDTO joinDTO) {   // json으로 입력받으려면 @RequestBody 필요 (기본은 x-www-form-urlencoded)
-        // 1. 유효성 검사
+    public ResponseEntity<?> join(@RequestBody @Valid UserRequset.JoinDTO joinDTO, Errors errors) {   // json으로 입력받으려면 @RequestBody 필요 (기본은 x-www-form-urlencoded)
 
-        // 2. 회원가입 (원래는 서비스 요청) - 시큐리티는 password 인코딩이 무조건 되어야 한다.
-        joinDTO.setPassword(passwordEncoder.encode(joinDTO.getPassword()));
-        User userPS = userRepository.save(joinDTO.toEntity());
-        UserResponse.JoinDTO responseDTO = new UserResponse.JoinDTO(userPS);
+        UserResponse.JoinDTO responseDTO = userService.회원가입(joinDTO);
 
-        // 3. 응답
         return ResponseEntity.ok().body(ApiUtils.success(responseDTO));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequset.LoginDTO loginDTO) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserRequset.LoginDTO loginDTO, Errors errors) {
 
         try {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
